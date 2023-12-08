@@ -1,0 +1,8 @@
+eureka:
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+  server:
+    enable-self-preservation: false #关闭自我保护
+
+EUREKA_DEFAULT_ZONE: http://localhost:${server.port}/eureka

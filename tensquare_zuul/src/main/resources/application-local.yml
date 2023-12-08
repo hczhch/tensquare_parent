@@ -1,0 +1,1 @@
+EUREKA_DEFAULT_ZONE: http://localhost:10086/eureka

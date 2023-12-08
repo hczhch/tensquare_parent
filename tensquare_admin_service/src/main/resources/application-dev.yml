@@ -1,0 +1,4 @@
+EUREKA_DEFAULT_ZONE: http://192.168.23.16:10086/eureka,http://192.168.23.17:10086/eureka
+MYSQL_URL: jdbc:mysql://192.168.23.11:3306/tensquare_user?characterEncoding=UTF8&useSSL=false
+MYSQL_USER: root
+MYSQL_PWD: root

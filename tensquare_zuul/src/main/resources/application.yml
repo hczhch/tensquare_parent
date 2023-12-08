@@ -1,0 +1,38 @@
+server:
+  port: 10020
+spring:
+  application:
+    name: tensquare-zuul
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_DEFAULT_ZONE}
+  instance:
+    prefer-ip-address: true
+
+ribbon:
+  ConnectTimeout: 1500
+  ReadTimeout: 3000
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMillisecond: 2000
+
+zuul:
+  routes:
+    admin:
+      path: /admin/**
+      serviceId: tensquare-admin-service
+    gathering:
+          path: /gathering/**
+          serviceId: tensquare-gathering
+
+jwt:
+  config:
+    key: itcast
+    ttl: 1800000
