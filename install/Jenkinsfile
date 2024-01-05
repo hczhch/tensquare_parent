@@ -119,7 +119,13 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
         }
 
         stage('Publish') {
+            for(int i=0; i<selectedServices.length; i++) {
+                def serviceName = selectedServices[i]
+                def containerName = "${projectName}-${BRANCH_NAME}-${serviceName}"
+                def image = "${harborUrl}/${harborProject}/${containerName}:${version}"
 
+                sh "Publish down"
+            }
         }
     }
 }
