@@ -100,7 +100,7 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
                 def image = "${harborUrl}/${harborProject}/${containerName}:${version}"
 
                 dir("${contextPath}/install/${serviceName}") {
-                    sh "mv ${contextPath}/${serviceName}/target/app.jar ."
+                    sh "mv ${contextPath}/${serviceName}/target ."
 
                     sh "docker build -t ${image} ."
 
