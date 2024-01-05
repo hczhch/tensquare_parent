@@ -55,8 +55,6 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
         stage('Check') {
             for(int i=0; i<selectedServices.length; i++) {
                 def serviceName = selectedServices[i]
-                //def containerName = "${projectName}-${BRANCH_NAME}-${serviceName}"
-                //def image = "${harborUrl}/${harborProject}/${containerName}:${version}"
 
                 dir("${contextPath}/${serviceName}") {
                     withSonarQubeEnv('sonar') { // 'sonar'：安装 SonarQube Scanner 插件后设置的名为 sonar 的 SonarQube servers ，其中包含 SonarQube 的地址和 token
@@ -75,12 +73,23 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
             }
         }
 
-        stage('build common'){
+        stage('Build'){
             dir("${contextPath}") {
                 // 安装父工程 -N,--non-recursive 表示不递归到子项目
                 sh "mvn clean install -N"
                 // 安装 common module
                 sh "mvn -f tensquare_common clean install -Dmaven.test.skip=true"
+            }
+
+            for(int i=0; i<selectedServices.length; i++) {
+                def serviceName = selectedServices[i]
+                //def containerName = "${projectName}-${BRANCH_NAME}-${serviceName}"
+                //def image = "${harborUrl}/${harborProject}/${containerName}:${version}"
+
+                dir("${contextPath}/${serviceName}") {
+                    sh "mvn clean package -Dmaven.test.skip=true"
+                    sh "mv target/*.jar target/app.jar"
+                }
             }
         }
     }
