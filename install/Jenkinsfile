@@ -9,15 +9,16 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
       name: 'jnlp',
       image: "harbor.zhch.lan/library/inbound-agent:3198.jdk17-maven3.9"
     ),
-    containerTemplate(
+/*     containerTemplate(
       name: 'docker',
       image: "docker:24.0.7",
       ttyEnabled: true,
       command: 'cat'
-    )
+    ) */
   ],
   volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
+    hostPathVolume(mountPath: '/usr/bin/docker', hostPath: '/usr/bin/docker'),
     nfsVolume(mountPath: '/home/jenkins/repo', serverAddress: 'k8s-master1.zhch.lan' , serverPath: '/root/nfs_data/rw/maven/repo'),
     configMapVolume(mountPath: '/usr/local/maven/conf/settings.xml', subPath: 'settings.xml', configMapName: 'maven')
   ]
@@ -102,17 +103,15 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
                     sh "mv ${contextPath}/${serviceName}/target ."
                     sh "mv target/*.jar target/app.jar"
 
-                    container('docker') {
-                        sh "docker build -t ${image} ."
+                    sh "docker build -t ${image} ."
 
-                        // 登录 harbor
-                        withCredentials([usernamePassword(credentialsId: "$harborAuth", passwordVariable: 'PASSWD', usernameVariable: 'UNAME')]) {
-                            //sh "docker login -u $UNAME -p $PASSWD $harborUrl"
-                            sh "echo $PASSWD | docker login -u $UNAME --password-stdin $harborUrl"
-                        }
-                        // 推送镜像
-                        sh "docker push ${image}"
+                    // 登录 harbor
+                    withCredentials([usernamePassword(credentialsId: "$harborAuth", passwordVariable: 'PASSWD', usernameVariable: 'UNAME')]) {
+                        //sh "docker login -u $UNAME -p $PASSWD $harborUrl"
+                        sh "echo $PASSWD | docker login -u $UNAME --password-stdin $harborUrl"
                     }
+                    // 推送镜像
+                    sh "docker push ${image}"
                 }
             }
         }
