@@ -1,11 +1,8 @@
-/*
-cloud: 'k8s' ：jenkins 安装 kubernetes 后创建的一个名为 k8s 的 kubernetes 云
-harbor.zhch.lan/library/inbound-agent:3198.jdk17-maven3.9 ：手动构建的集成了 maven 的 jenkins slave 镜像，并上传到了 harbor 仓库的公开项目中
-
-*/
-
 // https://www.jenkins.io/doc/pipeline/steps/kubernetes/
+// cloud: 'k8s' ：jenkins 安装 kubernetes 插件后创建的一个名为 k8s 的 kubernetes 云
 // 每个 Kubernetes namespace 至少包含一个 ServiceAccount：也就是该名字空间的默认服务账号， 名为 default
+// jenkins-slave 由 Jenkins Master 动态创建，jenkins-slave 的 namespace 与 Jenkins Master 的 namespace 相同
+// serviceAccount: 'jenkins' 的权限可以查看 https://gitee.com/hczhch/kubernetes-learning-notes/blob/master/25%20Jenkins.md
 podTemplate(label: 'jenkins-slave', cloud: 'k8s', serviceAccount: 'jenkins', containers: [
     containerTemplate(
       name: 'jnlp',
@@ -81,8 +78,6 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', serviceAccount: 'jenkins', con
 
             for(int i=0; i<selectedServices.length; i++) {
                 def serviceName = selectedServices[i]
-                //def containerName = "${projectName}-${BRANCH_NAME}-${serviceName}"
-                //def image = "${harborUrl}/${harborProject}/${containerName}:${version}"
 
                 dir("${contextPath}/${serviceName}") {
                     sh "mvn clean package -Dmaven.test.skip=true"
