@@ -102,18 +102,17 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
                     sh "mv ${contextPath}/${serviceName}/target ."
                     sh "mv target/*.jar target/app.jar"
 
-                    sh "docker build -t ${image} ."
+                    container('docker') {
+                        sh "docker build -t ${image} ."
 
-                    // 登录 harbor
-                    withCredentials([usernamePassword(credentialsId: "$harborAuth", passwordVariable: 'PASSWD', usernameVariable: 'UNAME')]) {
-                        //sh "docker login -u $UNAME -p $PASSWD $harborUrl"
-                        sh "echo $PASSWD | docker login -u $UNAME --password-stdin $harborUrl"
+                        // 登录 harbor
+                        withCredentials([usernamePassword(credentialsId: "$harborAuth", passwordVariable: 'PASSWD', usernameVariable: 'UNAME')]) {
+                            //sh "docker login -u $UNAME -p $PASSWD $harborUrl"
+                            sh "echo $PASSWD | docker login -u $UNAME --password-stdin $harborUrl"
+                        }
+                        // 推送镜像
+                        sh "docker push ${image}"
                     }
-                    // 推送镜像
-                    sh "docker push ${image}"
-
-                    // 删除本地镜像
-                    sh "docker rmi ${image}"
                 }
             }
         }
