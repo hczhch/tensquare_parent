@@ -130,7 +130,6 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', serviceAccount: 'jenkins', con
                         sed -i "s/IMAGE/${containerName}/g" install.yaml
                         sed -i "s/TAG/${version}/g" install.yaml
 
-                        cat install.yaml
                         kubectl apply -f install.yaml
                     """
                 }
