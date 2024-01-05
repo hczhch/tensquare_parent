@@ -52,7 +52,7 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
             }
         }
 
-        stag('Check') {
+        stage('Check') {
             for(int i=0; i<selectedServices.length; i++) {
                 def serviceName = selectedServices[i]
                 //def containerName = "${projectName}-${BRANCH_NAME}-${serviceName}"
