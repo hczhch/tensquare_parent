@@ -120,12 +120,16 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', serviceAccount: 'jenkins', con
             for(int i=0; i<selectedServices.length; i++) {
                 def serviceName = selectedServices[i]
                 def containerName = "${projectName}-${BRANCH_NAME}-${serviceName}"
-                def image = "${harborUrl}/${harborProject}/${containerName}:${version}"
+                //def image = "${harborUrl}/${harborProject}/${containerName}:${version}"
 
                 dir("${contextPath}/install/${serviceName}") {
                     sh """
                         sed -i "s/NAMESPACE/${namespace}/g" install.yaml
-                        sed -i "s/IMAGE/${image}/g" install.yaml
+                        sed -i "s/HARBOR/${harborUrl}/g" install.yaml
+                        sed -i "s/PROJECT/${harborProject}/g" install.yaml
+                        sed -i "s/IMAGE/${containerName}/g" install.yaml
+                        sed -i "s/TAG/${version}/g" install.yaml
+
                         cat install.yaml
                     """
                 }

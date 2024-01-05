@@ -49,7 +49,7 @@ spec:
         - name: harbor-auth
       containers:
         - name: eureka-server
-          image: IMAGE
+          image: HARBOR/PROJECT/IMAGE:TAG
           imagePullPolicy: IfNotPresent
           env:
             - name: EUREKA_DEFAULT_ZONE
