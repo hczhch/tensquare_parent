@@ -19,6 +19,7 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
   volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
     hostPathVolume(mountPath: '/usr/bin/docker', hostPath: '/usr/bin/docker'),
+    hostPathVolume(mountPath: '/usr/bin/kubectl', hostPath: '/usr/bin/kubectl'),
     nfsVolume(mountPath: '/home/jenkins/repo', serverAddress: 'k8s-master1.zhch.lan' , serverPath: '/root/nfs_data/rw/maven/repo'),
     configMapVolume(mountPath: '/usr/local/maven/conf/settings.xml', subPath: 'settings.xml', configMapName: 'maven')
   ]
@@ -122,6 +123,7 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
                 def containerName = "${projectName}-${BRANCH_NAME}-${serviceName}"
                 def image = "${harborUrl}/${harborProject}/${containerName}:${version}"
 
+                sh "kubectl get po"
                 echo "Publish down"
             }
         }
