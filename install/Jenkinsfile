@@ -124,8 +124,8 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', serviceAccount: 'jenkins', con
 
                 dir("${contextPath}/install/${serviceName}") {
                     sh """
-                        sed -i 's/TARGET_NAMESPACE/${namespace}/g' install.yaml
-                        sed -i 's/IMAGE_WITH_TAG/${image}/g' install.yaml
+                        sed -i "s/NAMESPACE/${namespace}/g" install.yaml
+                        sed -i "s/IMAGE/${image}/g" install.yaml
                         cat install.yaml
                     """
                 }

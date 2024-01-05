@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: eureka-server-headless
-  namespace: TARGET_NAMESPACE
+  namespace: NAMESPACE
   labels:
     app: eureka-server-headless
 spec:
@@ -19,7 +19,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: eureka-server
-  namespace: TARGET_NAMESPACE
+  namespace: NAMESPACE
   labels:
     app: eureka-server
 spec:
@@ -49,7 +49,7 @@ spec:
         - name: harbor-auth
       containers:
         - name: eureka-server
-          image: IMAGE_WITH_TAG
+          image: IMAGE
           imagePullPolicy: IfNotPresent
           env:
             - name: EUREKA_DEFAULT_ZONE
