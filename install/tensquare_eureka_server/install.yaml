@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-server-headless
+  namespace: TARGET_NAMESPACE
+  labels:
+    app: eureka-server-headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: eureka-server
+  ports:
+    - name: server
+      port: 10086
+      targetPort: server
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eureka-server
+  namespace: TARGET_NAMESPACE
+  labels:
+    app: eureka-server
+spec:
+  serviceName: eureka-server-headless
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eureka-server
+  template:
+    metadata:
+      labels:
+        app: eureka-server
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                        - eureka-server
+                topologyKey: "kubernetes.io/hostname"
+      imagePullSecrets:
+        - name: harbor-auth
+      containers:
+        - name: eureka-server
+          image: IMAGE_WITH_TAG
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: EUREKA_DEFAULT_ZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: tensquare_eureka_server
+                  key: EUREKA_DEFAULT_ZONE
+          ports:
+            - name: server
+              containerPort: 10086
+              protocol: TCP
+          volumeMounts:
+            - name: timezone
+              mountPath: /etc/localtime
+              readOnly: true
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai

@@ -1,3 +1,9 @@
+/*
+kubectl create secret docker-registry harbor-auth -n k8s-tensquare \
+    --docker-server='harbor.zhch.lan' \
+    --docker-username='vito' \
+    --docker-password='Harbor12345'
+ */
 // https://www.jenkins.io/doc/pipeline/steps/kubernetes/
 // cloud: 'k8s' ：jenkins 安装 kubernetes 插件后创建的一个名为 k8s 的 kubernetes 云
 // 每个 Kubernetes namespace 至少包含一个 ServiceAccount：也就是该名字空间的默认服务账号， 名为 default
@@ -109,10 +115,18 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', serviceAccount: 'jenkins', con
         }
 
         stage('Publish') {
+            def namespace = "${BRANCH_NAME}-${projectName}"
+
             for(int i=0; i<selectedServices.length; i++) {
                 def serviceName = selectedServices[i]
                 def containerName = "${projectName}-${BRANCH_NAME}-${serviceName}"
                 def image = "${harborUrl}/${harborProject}/${containerName}:${version}"
+
+                sh """
+sed -i 's/TARGET_NAMESPACE/"${namespace}"/g' install.yaml
+sed -i 's/IMAGE_WITH_TAG/"${image}"/g' install.yaml
+cat install.yaml
+                """
 
                 sh "kubectl get po"
                 echo "Publish down"

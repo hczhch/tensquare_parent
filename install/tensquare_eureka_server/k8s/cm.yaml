@@ -1,0 +1,9 @@
+# 该文件需要手动在 kubernetes 中执行
+# k8s 是分支名称，正常的分支名称应该是 dev 、 test 、 prod  ......
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tensquare-eureka-server # name 不能带下划线，只好用横线替换下划线
+  namespace: k8s-tensquare
+data:
+  EUREKA_DEFAULT_ZONE: 'http://eureka-server-headless.k8s-tensquare:10086/eureka'
