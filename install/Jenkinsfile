@@ -103,15 +103,15 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
                     sh "mv ${contextPath}/${serviceName}/target ."
                     sh "mv target/*.jar target/app.jar"
 
-                    sh "docker build -t ${image} ."
+                    sh "sudo docker build -t ${image} ."
 
                     // 登录 harbor
                     withCredentials([usernamePassword(credentialsId: "$harborAuth", passwordVariable: 'PASSWD', usernameVariable: 'UNAME')]) {
                         //sh "docker login -u $UNAME -p $PASSWD $harborUrl"
-                        sh "echo $PASSWD | docker login -u $UNAME --password-stdin $harborUrl"
+                        sh "echo $PASSWD | sudo docker login -u $UNAME --password-stdin $harborUrl"
                     }
                     // 推送镜像
-                    sh "docker push ${image}"
+                    sh "sudo docker push ${image}"
                 }
             }
         }
