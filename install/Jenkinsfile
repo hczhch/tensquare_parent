@@ -65,8 +65,8 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
                             -Dsonar.sourceEncoding=UTF-8 -Dsonar.java.binaries=.
                         """
                     }
-                    timeout(time: 3, unit: 'MINUTES') {
-                        // waitForQualityGate : 等待 SonarQube 分析完成并返回质量状态
+                    timeout(time: 1, unit: 'MINUTES') {
+                        // waitForQualityGate : 等待 SonarQube 分析完成并返回质量状态，需要在 SonarQube 中配置 Webhook
                         waitForQualityGate abortPipeline: true
                     }
                 }
