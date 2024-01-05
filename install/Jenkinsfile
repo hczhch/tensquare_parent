@@ -1,20 +1,60 @@
-def harborUrl = "harbor.zhch.lan"
-def harborAuth = "7e2f3356-45b3-4d89-b727-967569d5c2ae"
-def harborProject = "tensquare"
+/*
+cloud: 'k8s' ：jenkins 安装 kubernetes 后创建的一个名为 k8s 的 kubernetes 云
+harbor.zhch.lan/library/inbound-agent:3198.jdk17-maven3.9 ：手动构建的集成了 maven 的 jenkins slave 镜像，并上传到了 harbor 仓库的公开项目中
 
-def gitUrl = "git@git.zhch.lan:test/tensquare_parent.git"
-def gitAuth = "4488bfb8-2d68-4419-a79e-ccbb9928c3fe"
+*/
 
-def projectName = "tensquare"
-def version = new Date().format("yyyy.MMdd.HHmmss", TimeZone.getTimeZone('Asia/Shanghai'))
+podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
+    containerTemplate(
+      name: 'jnlp',
+      image: "harbor.zhch.lan/library/inbound-agent:3198.jdk17-maven3.9"
+    ),
+    containerTemplate(
+      name: 'docker',
+      image: "docker:24.0.7",
+      ttyEnabled: true,
+      command: 'cat'
+    )
+  ],
+  volumes: [
+    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
+    nfsVolume(mountPath: '/home/jenkins/repo', serverAddress: 'k8s-master1.zhch.lan' , serverPath: '/root/nfs_data/rw/maven/repo'),
+    configMapVolume(mountPath: '/usr/local/maven/conf/settings.xml', subPath: 'settings.xml', configMapName: 'maven')
+  ]
+)
+node("jenkins-slave") {
+    def harborUrl = "harbor.zhch.lan"
+    def harborAuth = "db9ca6e9-6c79-4ec4-a4ab-aba89df6a865"
+    def harborProject = "tensquare"
+
+    // 本地搭建 gitlab 后内存不够用，所以改用 gitee
+    def gitUrl = "git@gitee.com:hczhch/tensquare_parent.git"
+    def gitAuth = "6abb5fce-19df-4890-86e1-f0350eb44d91"
+
+    def projectName = "tensquare"
+    def version = new Date().format("yyyy.MMdd.HHmmss", TimeZone.getTimeZone('Asia/Shanghai'))
+
+
+    stage('Clone') {
+        echo "Create contextPath: ${contextPath}"
+        sh "mkdir -p ${contextPath}"
+        dir("${contextPath}") {
+            echo "Checkout start"
+            checkout scmGit(branches: [[name: '*/${BRANCH_NAME}']], extensions: [], userRemoteConfigs: [[credentialsId: "${gitAuth}", url: "${gitUrl}"]])
+            echo "Checkout done."
+        }
+    }
+}
+
+
+
+/*
 def workDir = "/root/jenkins/build"
 def contextPath = "${workDir}/${projectName}/${version}"
 
 node {
     //获取当前选择的微服务名称
     def selectedServices = "${SERVICE_NAME}".split(",")
-    //获取当前选择的服务器名称
-    def selectedHosts = "${HOST_NAME}".split(",")
 
     stage('Clone') {
         echo "Create contextPath: ${contextPath}"
@@ -90,3 +130,4 @@ node {
         echo "Clean done."
     }
 }
+*/
