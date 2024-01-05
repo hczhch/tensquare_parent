@@ -4,17 +4,13 @@ harbor.zhch.lan/library/inbound-agent:3198.jdk17-maven3.9 ：手动构建的集�
 
 */
 
-podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
+// https://www.jenkins.io/doc/pipeline/steps/kubernetes/
+// 每个 Kubernetes namespace 至少包含一个 ServiceAccount：也就是该名字空间的默认服务账号， 名为 default
+podTemplate(label: 'jenkins-slave', cloud: 'k8s', serviceAccount: 'jenkins', containers: [
     containerTemplate(
       name: 'jnlp',
       image: "harbor.zhch.lan/library/inbound-agent:3198.jdk17-maven3.9"
-    ),
-/*     containerTemplate(
-      name: 'docker',
-      image: "docker:24.0.7",
-      ttyEnabled: true,
-      command: 'cat'
-    ) */
+    )
   ],
   volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
