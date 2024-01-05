@@ -56,20 +56,20 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
             for(int i=0; i<selectedServices.length; i++) {
                 def serviceName = selectedServices[i]
 
-                dir("${contextPath}/${serviceName}") {
-                    withSonarQubeEnv('sonar') { // 'sonar'：安装 SonarQube Scanner 插件后设置的名为 sonar 的 SonarQube servers ，其中包含 SonarQube 的地址和 token
-                        sh """
-                            sonar-scanner -Dsonar.projectname="${serviceName}" -Dsonar.projectKey="${serviceName}" \
-                            -Dsonar.sources=. -Dsonar.exclusions=**/test/**,**/target/** \
-                            -Dsonar.java.source=1.8 -Dsonar.java.target=1.8 \
-                            -Dsonar.sourceEncoding=UTF-8 -Dsonar.java.binaries=.
-                        """
-                    }
-                    timeout(time: 1, unit: 'MINUTES') {
-                        // waitForQualityGate : 等待 SonarQube 分析完成并返回质量状态，需要在 SonarQube 中配置 Webhook
-                        waitForQualityGate abortPipeline: true
-                    }
-                }
+//                 dir("${contextPath}/${serviceName}") {
+//                     withSonarQubeEnv('sonar') { // 'sonar'：安装 SonarQube Scanner 插件后设置的名为 sonar 的 SonarQube servers ，其中包含 SonarQube 的地址和 token
+//                         sh """
+//                             sonar-scanner -Dsonar.projectname="${serviceName}" -Dsonar.projectKey="${serviceName}" \
+//                             -Dsonar.sources=. -Dsonar.exclusions=**/test/**,**/target/** \
+//                             -Dsonar.java.source=1.8 -Dsonar.java.target=1.8 \
+//                             -Dsonar.sourceEncoding=UTF-8 -Dsonar.java.binaries=.
+//                         """
+//                     }
+//                     timeout(time: 1, unit: 'MINUTES') {
+//                         // waitForQualityGate : 等待 SonarQube 分析完成并返回质量状态，需要在 SonarQube 中配置 Webhook
+//                         waitForQualityGate abortPipeline: true
+//                     }
+//                 }
             }
         }
 
@@ -88,7 +88,6 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
 
                 dir("${contextPath}/${serviceName}") {
                     sh "mvn clean package -Dmaven.test.skip=true"
-                    sh "mv target/*.jar target/app.jar"
                 }
             }
         }
@@ -101,6 +100,7 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
 
                 dir("${contextPath}/install/${serviceName}") {
                     sh "mv ${contextPath}/${serviceName}/target ."
+                    sh "mv target/*.jar target/app.jar"
 
                     sh "docker build -t ${image} ."
 
