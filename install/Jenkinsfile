@@ -23,18 +23,21 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
   ]
 )
 {
+    def harborUrl = "harbor.zhch.lan"
+    def harborAuth = "db9ca6e9-6c79-4ec4-a4ab-aba89df6a865"
+    def harborProject = "tensquare"
+
+    // 本地搭建 gitlab 后内存不够用，所以改用 gitee
+    def gitUrl = "git@gitee.com:hczhch/tensquare_parent.git"
+    def gitAuth = "6abb5fce-19df-4890-86e1-f0350eb44d91"
+
+    def projectName = "tensquare"
+    def version = new Date().format("yyyy.MMdd.HHmmss", TimeZone.getTimeZone('Asia/Shanghai'))
+
+    def workDir = "/root/jenkins/build"
+    def contextPath = "${workDir}/${projectName}/${version}"
+
     node("jenkins-slave") {
-        def harborUrl = "harbor.zhch.lan"
-        def harborAuth = "db9ca6e9-6c79-4ec4-a4ab-aba89df6a865"
-        def harborProject = "tensquare"
-
-        // 本地搭建 gitlab 后内存不够用，所以改用 gitee
-        def gitUrl = "git@gitee.com:hczhch/tensquare_parent.git"
-        def gitAuth = "6abb5fce-19df-4890-86e1-f0350eb44d91"
-
-        def projectName = "tensquare"
-        def version = new Date().format("yyyy.MMdd.HHmmss", TimeZone.getTimeZone('Asia/Shanghai'))
-
 
         stage('Clone') {
             echo "Create contextPath: ${contextPath}"
@@ -45,5 +48,7 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
                 echo "Checkout done."
             }
         }
+
+
     }
 }
