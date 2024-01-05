@@ -34,7 +34,7 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', containers: [
     def projectName = "tensquare"
     def version = new Date().format("yyyy.MMdd.HHmmss", TimeZone.getTimeZone('Asia/Shanghai'))
 
-    def workDir = "/root/jenkins/build"
+    def workDir = "/home/jenkins/build"
     def contextPath = "${workDir}/${projectName}/${version}"
 
     node("jenkins-slave") {
