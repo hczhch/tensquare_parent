@@ -86,8 +86,10 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', serviceAccount: 'jenkins', con
                 def serviceName = selectedServices[i]
 
                 dir("${contextPath}/${serviceName}") {
+                    // 部署成功后，通过访问 http://ip:port/version 可以获取版本等信息
+                    // 目前仅有 tensquare_eureka_server 通过 Filter 实现了该功能（具体请查看 VersionFilter.java 文件）
                     sh """
-                    tee ./src/main/resources/version.html <<-'EOF'
+                    tee ./src/main/resources/version.txt <<-'EOF'
                     Branch: ${BRANCH_NAME}<br/>
                     Project: ${projectName}<br/>
                     Service: ${serviceName}<br/>
