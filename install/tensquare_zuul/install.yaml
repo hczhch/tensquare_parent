@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensquare-zuul
+  namespace: NAMESPACE
+  labels:
+    app: tensquare-zuul
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tensquare-zuul
+  template:
+    metadata:
+      labels:
+        app: tensquare-zuul
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                        - tensquare-zuul
+                topologyKey: "kubernetes.io/hostname"
+      imagePullSecrets:
+        - name: harbor-auth
+      containers:
+        - name: tensquare-zuul
+          image: HARBOR/PROJECT/IMAGE:TAG
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: EUREKA_DEFAULT_ZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: tensquare-common
+                  key: EUREKA_DEFAULT_ZONE
+          ports:
+            - name: zuul
+              containerPort: 10020
+              protocol: TCP
+          volumeMounts:
+            - name: timezone
+              mountPath: /etc/localtime
+              readOnly: true
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
