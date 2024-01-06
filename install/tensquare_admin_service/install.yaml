@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensquare-admin-service
+  namespace: NAMESPACE
+  labels:
+    app: tensquare-admin-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tensquare-admin-service
+  template:
+    metadata:
+      labels:
+        app: tensquare-admin-service
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app"
+                      operator: In
+                      values:
+                        - tensquare-admin-service
+                topologyKey: "kubernetes.io/hostname"
+      imagePullSecrets:
+        - name: harbor-auth
+      containers:
+        - name: tensquare-admin-service
+          image: HARBOR/PROJECT/IMAGE:TAG
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: EUREKA_DEFAULT_ZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: tensquare-common
+                  key: EUREKA_DEFAULT_ZONE
+            - name: MYSQL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: tensquare-admin-service
+                  key: MYSQL_URL
+            - name: MYSQL_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: tensquare-admin-service
+                  key: MYSQL_USER
+            - name: MYSQL_PWD
+              valueFrom:
+                configMapKeyRef:
+                  name: tensquare-admin-service
+                  key: MYSQL_PWD
+          ports:
+            - name: user
+              containerPort: 9001
+              protocol: TCP
+          volumeMounts:
+            - name: timezone
+              mountPath: /etc/localtime
+              readOnly: true
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai

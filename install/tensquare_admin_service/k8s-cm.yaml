@@ -1,0 +1,11 @@
+# 该文件需要手动在 kubernetes 中执行
+# k8s 是分支名称，正常的分支名称应该是 dev 、 test 、 prod  ......
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tensquare-admin-service # name 不能带下划线，只好用横线替换下划线
+  namespace: k8s-tensquare
+data:
+  MYSQL_URL: "jdbc:mysql://mysql-x.dev-mysql:3306/tensquare_user?characterEncoding=UTF8&useSSL=false"
+  MYSQL_USER: "root"
+  MYSQL_PWD: "xhBQ9QN7d+sF"
