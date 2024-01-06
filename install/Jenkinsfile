@@ -87,7 +87,7 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', serviceAccount: 'jenkins', con
 
                 dir("${contextPath}/${serviceName}") {
                     sh """
-                    tee ./src/main/sources/version.html <<-'EOF'
+                    tee ./src/main/resources/version.html <<-'EOF'
                     Branch: ${BRANCH_NAME}<br/>
                     Project: ${projectName}<br/>
                     Service: ${serviceName}<br/>
