@@ -55,7 +55,7 @@ spec:
             - name: EUREKA_DEFAULT_ZONE
               valueFrom:
                 configMapKeyRef:
-                  name: tensquare-eureka-server
+                  name: tensquare-common
                   key: EUREKA_DEFAULT_ZONE
           ports:
             - name: server
