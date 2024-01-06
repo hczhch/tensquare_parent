@@ -1,0 +1,38 @@
+# 手动创建
+# 暴露给前端项目访问
+# namespace 和 host 中的 k8s 是分支名称，正常的分支名称应该是 dev 、 test 、 prod  ......
+apiVersion: v1
+kind: Service
+metadata:
+  name: tensquare-zuul-headless
+  namespace: k8s-tensquare
+  labels:
+    app: tensquare-zuul-headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: tensquare-zuul
+  ports:
+    - name: zuul
+      port: 10020
+      targetPort: zuul
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tensquare-zuul
+  namespace: k8s-tensquare
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: tensquare-zuul-k8s.zhch.lan
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tensquare-zuul-headless
+                port:
+                  name: zuul
