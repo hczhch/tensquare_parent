@@ -51,3 +51,21 @@ spec:
         - name: timezone
           hostPath:
             path: /usr/share/zoneinfo/Asia/Shanghai
+---
+# 暴露给前端项目访问
+apiVersion: v1
+kind: Service
+metadata:
+  name: tensquare-zuul-headless
+  namespace: NAMESPACE
+  labels:
+    app: tensquare-zuul-headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: tensquare-zuul
+  ports:
+    - name: zuul
+      port: 10020
+      targetPort: zuul
