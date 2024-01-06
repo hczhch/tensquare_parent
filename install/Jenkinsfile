@@ -86,6 +86,15 @@ podTemplate(label: 'jenkins-slave', cloud: 'k8s', serviceAccount: 'jenkins', con
                 def serviceName = selectedServices[i]
 
                 dir("${contextPath}/${serviceName}") {
+                    sh """
+                    tee src/main/sources/version.html <<-'EOF'
+                    Branch: ${BRANCH_NAME}<br/>
+                    Project: ${projectName}<br/>
+                    Service: ${serviceName}<br/>
+                    Build Version: ${version}<br/>
+                    EOF
+                    """
+
                     sh "mvn clean package -Dmaven.test.skip=true"
                 }
             }
