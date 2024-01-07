@@ -61,6 +61,29 @@ spec:
             - name: server
               containerPort: 10086
               protocol: TCP
+          startupProbe: # 启动探针探测成功后，存活探针和就绪探针才会开始工作；存活探针与就绪性探针相互间不等待对方成功，不存在先后关系。
+            tcpSocket:
+              port: 10086
+            timeoutSeconds: 3 # 超时时间
+            periodSeconds: 10 # 探测间隔时间
+            failureThreshold: 20 # 连续探测失败 20 次就表示失败，容器会被杀死。（即容器最多有 10 * 20 = 200s 的时间来完成启动）
+            successThreshold: 1 # 连续探测 1 次成功就表示成功
+          livenessProbe:
+            httpGet:
+              path: /health-check?from=livenessProbe
+              port: 10086
+            timeoutSeconds: 3
+            periodSeconds: 15
+            failureThreshold: 12
+            successThreshold: 1
+          readinessProbe: # 就绪探针探测成功后程序才会接收请求
+            httpGet:
+              path: /health-check?from=readinessProbe
+              port: 10086
+            timeoutSeconds: 3
+            periodSeconds: 10
+            failureThreshold: 6
+            successThreshold: 1
           volumeMounts:
             - name: timezone
               mountPath: /etc/localtime
