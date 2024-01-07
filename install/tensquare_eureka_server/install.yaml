@@ -68,7 +68,7 @@ spec:
             periodSeconds: 10 # 探测间隔时间
             failureThreshold: 20 # 连续探测失败 20 次就表示失败，容器会被杀死。（即容器最多有 10 * 20 = 200s 的时间来完成启动）
             successThreshold: 1 # 连续探测 1 次成功就表示成功
-          livenessProbe:
+          livenessProbe: # 如果存活探针探测失败，则 kubelet 会杀死容器，并且容器将根据其重启策略决定未来。探测成功后，存活探针并不会停止探测，而是会一直探测其存活状态。
             httpGet:
               path: /health-check?from=livenessProbe
               port: 10086
@@ -76,7 +76,7 @@ spec:
             periodSeconds: 15
             failureThreshold: 12
             successThreshold: 1
-          readinessProbe: # 就绪探针探测成功后程序才会接收请求
+          readinessProbe: # 就绪探针探测成功后程序才会接收请求，如果就绪态探测失败，端点控制器将从与 Pod 匹配的所有服务的端点列表中删除该 Pod 的 IP 地址。探测成功后，就绪探针并不会停止探测，而是会一直探测其就绪状态。
             httpGet:
               path: /health-check?from=readinessProbe
               port: 10086

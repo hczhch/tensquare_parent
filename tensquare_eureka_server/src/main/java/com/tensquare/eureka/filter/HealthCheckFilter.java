@@ -23,7 +23,6 @@ public class HealthCheckFilter implements Filter {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         String from = request.getParameter("from");
         //log.trace("===Health Check from {}===", from);
-        System.out.println("===Health Check from {}===" + from);
         httpServletResponse.getWriter().println("ok");
     }
 
